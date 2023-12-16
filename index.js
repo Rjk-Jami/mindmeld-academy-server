@@ -33,13 +33,14 @@ async function run() {
     const database = client.db("MindMeldAcademy");
     const collegesCollection = database.collection("colleges");
     const graduatesCollection = database.collection("graduates");
-
+    const admissionCollection = database.collection("admission")
+    const userCollection = database.collection("users")
     //search college
-    app.get('/getCollegesByAlphabet', async (req, res) => {
+    app.get('/getCollegesByAlphabet/:letter', async (req, res) => {
         
             const letter = req.params.letter.toUpperCase(); // Convert to uppercase for case-insensitivity
             console.log(letter);
-          const query = { name: { $regex: `^${letter}` } }; // Use a regular expression for matching the starting letter
+          const query = { name: { $regex: `${letter}` } }; // Use a regular expression for matching the starting letter
     
           const colleges = await collegesCollection.find(query).toArray();
             console.log(colleges);
@@ -71,13 +72,33 @@ async function run() {
         res.send(graduates)
 
       })
+      // add admission form to db
+      app.post('/admission', async(req,res)=>{
+        const newAdmission = req.body
+        const admission = await admissionCollection.insertOne(newAdmission)
+        res.send(admission)
+      })
+      // add users form to db
+      app.post('/users', async(req,res)=>{
+        const newUser = req.body
+        const user = await userCollection.insertOne(newUser)
+        res.send(user)
+      })
+      //get single college by email
+      app.get(`/myCollege/:email`, async(req,res)=>{
+        const email = req.params.email
+        const query = { email: email}
+        const college = await admissionCollection.find(query).toArray()
+        res.send(college)
+
+      })
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
-  }
+    }
 }
 run().catch(console.dir);
 
