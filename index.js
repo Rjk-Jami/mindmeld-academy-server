@@ -32,8 +32,9 @@ async function run() {
     // Send a ping to confirm a successful connection
     const database = client.db("MindMeldAcademy");
     const collegesCollection = database.collection("colleges");
+    const graduatesCollection = database.collection("graduates");
 
-    
+    //search college
     app.get('/getCollegesByAlphabet', async (req, res) => {
         
             const letter = req.params.letter.toUpperCase(); // Convert to uppercase for case-insensitivity
@@ -48,18 +49,26 @@ async function run() {
       
        
       });
+      //get all colleges
     app.get('/colleges', async (req,res)=>{
         const colleges = await collegesCollection.find().toArray()
-        console.log(colleges)
+        // console.log(colleges)
         res.send(colleges)
 
       })
-
+//get single college
       app.get(`/colleges/:id`, async(req,res)=>{
         const id = req.params.id
         const query = { _id : new ObjectId(id)}
         const college = await collegesCollection.findOne(query)
         res.send(college)
+
+      })
+      //get all graduates image
+      app.get('/graduates', async (req,res)=>{
+        const graduates = await graduatesCollection.find().toArray()
+        console.log(graduates)
+        res.send(graduates)
 
       })
 
